@@ -26,6 +26,12 @@ export const moreStoriesQuery = defineQuery(`
   }
 `);
 
+export const postsQuery = defineQuery(`
+  *[_type == "post"] | order(date desc, _updatedAt desc) {
+    ${postFields}
+  }
+`);
+
 export const postQuery = defineQuery(`
   *[_type == "post" && slug.current == $slug] [0] {
     content,
