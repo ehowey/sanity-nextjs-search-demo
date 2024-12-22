@@ -1,30 +1,26 @@
-import { Suspense } from "react";
 import { sanityFetch } from "@/sanity/lib/fetch";
-import { heroQuery, settingsQuery } from "@/sanity/lib/queries";
-import Intro from "./intro";
-import Search from "./search";
-import Posts from "./posts";
+import { postsQuery, settingsQuery } from "@/sanity/lib/queries";
+import { Suspense } from "react";
+import PostsSection from "./posts-section";
 
 export default async function Page() {
-  const [settings, heroPost] = await Promise.all([
+  const [settings, posts] = await Promise.all([
     sanityFetch({
       query: settingsQuery,
     }),
-    sanityFetch({ query: heroQuery }),
+    sanityFetch({ query: postsQuery }),
   ]);
 
   return (
     <div className="container mx-auto px-5">
-      <Intro title={settings?.title} description={settings?.description} />
-      <Search />
-      <section>
-        <h2 className="mb-8 text-6xl font-bold leading-tight tracking-tighter md:text-7xl">
-          Recipes
-        </h2>
-        <Suspense>
-          <Posts />
-        </Suspense>
+      <section className="mt-16 mb-16 flex flex-col items-center lg:mb-12 lg:flex-row lg:justify-between">
+        <h1 className="text-balance text-6xl font-bold leading-tight tracking-tighter lg:pr-8 lg:text-8xl">
+          {settings?.title}
+        </h1>
       </section>
+      <Suspense>
+        <PostsSection posts={posts} />
+      </Suspense>
     </div>
   );
 }

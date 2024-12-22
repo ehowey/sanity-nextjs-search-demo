@@ -3,15 +3,10 @@ import type { Metadata, ResolvingMetadata } from "next";
 import { type PortableTextBlock } from "next-sanity";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { Suspense } from "react";
-
-import Avatar from "../../avatar";
-import CoverImage from "../../cover-image";
-import DateComponent from "../../date";
-import MoreStories from "../../more-stories";
-import PortableText from "../../portable-text";
-
-import * as demo from "@/sanity/lib/demo";
+import { format } from "date-fns";
+import { Image } from "next-sanity/image";
+import { urlForImage } from "@/sanity/lib/utils";
+import PortableText from "@/app/(blog)/portable-text";
 import { sanityFetch } from "@/sanity/lib/fetch";
 import { postQuery, settingsQuery } from "@/sanity/lib/queries";
 import { resolveOpenGraphImage } from "@/sanity/lib/utils";
@@ -21,7 +16,7 @@ type Props = {
 };
 
 const postSlugs = defineQuery(
-  `*[_type == "post" && defined(slug.current)]{"slug": slug.current}`,
+  `*[_type == "post" && defined(slug.current)]{"slug": slug.current}`
 );
 
 export async function generateStaticParams() {
@@ -34,7 +29,7 @@ export async function generateStaticParams() {
 
 export async function generateMetadata(
   { params }: Props,
-  parent: ResolvingMetadata,
+  parent: ResolvingMetadata
 ): Promise<Metadata> {
   const post = await sanityFetch({
     query: postQuery,
@@ -68,30 +63,38 @@ export default async function PostPage({ params }: Props) {
     <div className="container mx-auto px-5">
       <h2 className="mb-16 mt-10 text-2xl font-bold leading-tight tracking-tight md:text-4xl md:tracking-tighter">
         <Link href="/" className="hover:underline">
-          {settings?.title || demo.title}
+          {settings?.title}
         </Link>
       </h2>
       <article>
         <h1 className="text-balance mb-12 text-6xl font-bold leading-tight tracking-tighter md:text-7xl md:leading-none lg:text-8xl">
           {post.title}
         </h1>
-        <div className="hidden md:mb-12 md:block">
-          {post.author && (
-            <Avatar name={post.author.name} picture={post.author.picture} />
-          )}
-        </div>
         <div className="mb-8 sm:mx-0 md:mb-16">
-          <CoverImage image={post.coverImage} priority />
+          <div className="shadow-md transition-shadow duration-200 group-hover:shadow-lg sm:mx-0">
+            <Image
+              className="h-auto w-full"
+              width={2000}
+              height={1000}
+              alt={post.coverImage?.alt || ""}
+              src={
+                urlForImage(post.coverImage)
+                  ?.height(1000)
+                  .width(2000)
+                  .url() as string
+              }
+              sizes="100vw"
+              priority
+            />
+          </div>
         </div>
         <div className="mx-auto max-w-2xl">
-          <div className="mb-6 block md:hidden">
-            {post.author && (
-              <Avatar name={post.author.name} picture={post.author.picture} />
-            )}
-          </div>
           <div className="mb-6 text-lg">
             <div className="mb-4 text-lg">
-              <DateComponent dateString={post.date} />
+              <time dateTime={post.date}>
+                {format(new Date(post.date), "LLLL	d, yyyy")}
+              </time>
+              {post.author && <p>{post.author.name}</p>}
             </div>
           </div>
         </div>
@@ -102,15 +105,6 @@ export default async function PostPage({ params }: Props) {
           />
         )}
       </article>
-      <aside>
-        <hr className="border-accent-2 mb-24 mt-28" />
-        <h2 className="mb-8 text-6xl font-bold leading-tight tracking-tighter md:text-7xl">
-          Recent Stories
-        </h2>
-        <Suspense>
-          <MoreStories skip={post._id} limit={2} />
-        </Suspense>
-      </aside>
     </div>
   );
 }
