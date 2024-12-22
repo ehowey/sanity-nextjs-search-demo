@@ -2,7 +2,7 @@
 
 import { useEffect, useRef, useActionState } from "react";
 import PostsSearchButton from "./posts-search-button";
-import { actionSearch } from "@/actions/search";
+import { actionSearch } from "@/actions/actionSearch";
 import { ActionSearchResult } from "@/types";
 import { PostsQueryResult } from "@/sanity.types";
 

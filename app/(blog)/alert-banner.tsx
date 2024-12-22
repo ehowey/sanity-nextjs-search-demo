@@ -2,8 +2,7 @@
 
 import { useRouter } from "next/navigation";
 import { useSyncExternalStore, useTransition } from "react";
-
-import { disableDraftMode } from "@/actions/disableDraftMode";
+import { actionDisableDraftMode } from "@/actions/actionDisableDraftMode";
 
 const emptySubscribe = () => () => {};
 
@@ -35,7 +34,7 @@ export default function AlertBanner() {
               type="button"
               onClick={() =>
                 startTransition(() =>
-                  disableDraftMode().then(() => {
+                  actionDisableDraftMode().then(() => {
                     router.refresh();
                   })
                 )

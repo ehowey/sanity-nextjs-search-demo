@@ -2,7 +2,7 @@
 
 import { draftMode } from "next/headers";
 
-export async function disableDraftMode() {
+export async function actionDisableDraftMode() {
   "use server";
   await Promise.allSettled([
     (await draftMode()).disable(),
